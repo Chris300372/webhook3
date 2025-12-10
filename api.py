@@ -105,7 +105,7 @@ def procesar_con_gemini_for_sender(sender_id: str, user_text: str) -> str:
     try:
         respuesta = search_file_store(
             contents=full_contents,
-            store_names=[FILE_SEARCH_STORE_ID] if not FILE_SEARCH_STORE_ID.startswith("fileSearchStores/") else [FILE_SEARCH_STORE_ID],
+            store_names=[FILE_SEARCH_STORE_ID],
             model="gemini-2.5-flash",
             system_instruction=SYSTEM_PROMPT_RESERVAS
         )
