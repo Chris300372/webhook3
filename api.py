@@ -232,43 +232,60 @@ def whatsapp_verify():
         return challenge, 200
     return "Verification token mismatch", 403
 
+# ... (todo tu código anterior se mantiene igual hasta el webhook)
+
+ADMIN_NUMBER = "51987819461"  # El número que tiene permiso de enviar tickets
+
 @app.route('/webhook', methods=['POST'])
 def whatsapp_webhook():
-    """
-    Endpoint que recibe eventos de WhatsApp Cloud API.
-    Extrae el número del remitente y el texto, procesa con Gemini/FileSearch y responde.
-    """
     payload = request.get_json(silent=True)
     if not payload:
         return "no payload", 400
 
-    # Manejo basado en la estructura típica de WhatsApp Cloud API
     try:
         entries = payload.get("entry", [])
         for entry in entries:
             changes = entry.get("changes", [])
             for change in changes:
                 value = change.get("value", {})
-                # A veces el campo 'messages' está dentro de value['messages']
                 messages = value.get("messages", []) or []
+                
                 for message in messages:
-                    sender = message.get("from")  # número de WhatsApp (ej "519XXXXXXXX")
+                    sender = message.get("from")
                     if not sender:
                         continue
 
                     mtype = message.get("type")
-                    if mtype == "text":
-                        user_text = message["text"].get("body", "")
-                    else:
-                        # Puedes añadir soporte para contactos, ubicaciones, etc.
-                        user_text = f"[Tipo de mensaje {mtype} no soportado por ahora]"
+                    if mtype != "text":
+                        continue
+                    
+                    user_text = message["text"].get("body", "").strip()
 
-                    # Procesar con RAG (por remitente)
+                    # --- NUEVA LÓGICA DE REENVÍO (TICKET) ---
+                    if sender == ADMIN_NUMBER and user_text.upper().startswith("TICKET:"):
+                        try:
+                            # Esperamos formato: "TICKET: 519XXXXXXXX Mensaje de respuesta"
+                            # Dividimos el texto: ["TICKET:", "519XXXXXXXX", "Mensaje...", "de...", "respuesta"]
+                            parts = user_text.split(maxsplit=2)
+                            
+                            if len(parts) >= 3:
+                                target_number = parts[1]  # El número del cliente
+                                message_to_send = parts[2] # El contenido del mensaje
+                                
+                                print(f"Redirigiendo mensaje de admin a: {target_number}")
+                                send_result = enviar_mensaje_whatsapp(target_number, message_to_send)
+                                return "EVENT_RECEIVED", 200
+                            else:
+                                # Si el formato es incorrecto, le avisamos al admin
+                                enviar_mensaje_whatsapp(ADMIN_NUMBER, "Formato incorrecto. Usa: TICKET: [numero] [mensaje]")
+                                return "EVENT_RECEIVED", 200
+                        except Exception as e:
+                            print(f"Error en el reenvío de ticket: {e}")
+                    # --- FIN LÓGICA DE REENVÍO ---
+
+                    # Lógica normal para el resto de usuarios
                     bot_response = procesar_con_gemini_for_sender(sender, user_text)
-
-                    # Enviar respuesta por WhatsApp
                     send_result = enviar_mensaje_whatsapp(sender, bot_response)
-                    # (opcional) loguear send_result
                     print("Envío WhatsApp resultado:", send_result)
 
         return "EVENT_RECEIVED", 200
@@ -277,7 +294,6 @@ def whatsapp_webhook():
         print("Error procesando webhook:", e)
         traceback.print_exc()
         return "error", 500
-
 # -------------------------
 # RUN (Railway / Heroku compatible)
 # -------------------------
