@@ -1,5 +1,5 @@
-# api.py
 import os
+# api.py
 import json
 import uuid
 import requests
@@ -126,6 +126,33 @@ def procesar_con_gemini_for_sender(sender_id: str, user_text: str) -> str:
 # -------------------------
 # FUNCION PARA ENVIAR MENSAJES POR WHATSAPP (Cloud API)
 # -------------------------
+
+
+def enviar_template_whatsapp(to_number: str, template_name: str, language_code: str = "es_PE"):
+    """
+    Envía una plantilla de WhatsApp aprobada. 
+    Ideal para iniciar conversaciones o responder tickets fuera de las 24h.
+    """
+    url = f"https://graph.facebook.com/v19.0/{WHATSAPP_PHONE_ID}/messages"
+    headers = {
+        "Authorization": f"Bearer {WHATSAPP_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": to_number,
+        "type": "template",
+        "template": {
+            "name": template_name,
+            "language": {
+                "code": language_code
+            }
+        }
+    }
+    resp = requests.post(url, headers=headers, json=payload)
+    return resp.json()
+
+
 def enviar_mensaje_whatsapp(to_number: str, message: str) -> dict:
     """
     Envía un mensaje de texto simple por la API de WhatsApp Cloud.
@@ -273,7 +300,7 @@ def whatsapp_webhook():
                                 message_to_send = parts[2] # El contenido del mensaje
                                 
                                 print(f"Redirigiendo mensaje de admin a: {target_number}")
-                                send_result = enviar_mensaje_whatsapp(target_number, message_to_send)
+                                send_result = enviar_template_whatsapp(target_number, "soporte_rustica","es_PE")
                                 return "EVENT_RECEIVED", 200
                             else:
                                 # Si el formato es incorrecto, le avisamos al admin
