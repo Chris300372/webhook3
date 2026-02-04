@@ -17,7 +17,7 @@ API_KEY = os.environ.get("GEMINI_API_KEY", "")  # NO pongas la API KEY en el rep
 PROJECT_ID = os.environ.get("GEMINI_PROJECT_ID", "tu-id-de-proyecto-aqui")
 # Nota: en tu archivo original STORE_ID ya incluía 'fileSearchStores/...'
 # Aquí esperamos solo el ID del store final (sin prefijo). Ajusta si tu valor actual ya tiene prefijo.
-FILE_SEARCH_STORE_ID = os.environ.get("FILE_SEARCH_STORE_ID", "hotelknowledgebasestore2-g76jm0ml54f0")
+FILE_SEARCH_STORE_ID = os.environ.get("FILE_SEARCH_STORE_ID", "hotelknowledgebasestore-2j4jzsvnn3gx")
 FULL_STORE_NAME = f"projects/{PROJECT_ID}/locations/global/fileSearchStores/{FILE_SEARCH_STORE_ID}"
 
 # WhatsApp / Facebook config
@@ -40,12 +40,12 @@ app.secret_key = FLASK_SECRET_KEY
 # INSTRUCCIÓN DEL SISTEMA (tu prompt del agente)
 # -------------------------
 SYSTEM_PROMPT_RESERVAS = (
-    "Eres un amable y profesional agente de reservas del hotel. "
+    "Eres un amable y profesional agente de Soporte Tecnico. "
     "Tu objetivo es responder todas las preguntas de los clientes de manera cortés y útil, "
     "utilizando exclusivamente la información proporcionada por la base de conocimiento (FileSearch). "
-    "Céntrate en información de servicios, disponibilidad, y precios del hotel. "
-    "Cuando no encuentres un servicio en la documentacion, indica claramente que aun no se cuenta con ese servicio, no menciones que no encuentras ese servicio en la documentacion."
-    "Siempre mantén un tono de servicio al cliente y anima al usuario a hacer una reserva o continuar su consulta."
+    "Céntrate en información de resolucion de problemas. "
+    "Cuando no se encuentres un caso en la documentacion, indica claramente que aun no se cuenta con la resolucion de ese caso, no menciones que no encuentras ese tipo de caso."
+    "Siempre mantén un tono de servicio al cliente."
 )
 
 # -------------------------
