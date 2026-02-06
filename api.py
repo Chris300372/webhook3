@@ -287,6 +287,7 @@ def whatsapp_webhook():
                         continue
                     
                     user_text = message["text"].get("body", "").strip()
+                    print(f">>> INCOMING FROM {sender}: {user_text}")
 
                     # --- NUEVA LÓGICA DE REENVÍO (TICKET) ---
                     if sender == ADMIN_NUMBER and user_text.upper().startswith("TICKET:"):
@@ -312,6 +313,7 @@ def whatsapp_webhook():
 
                     # Lógica normal para el resto de usuarios
                     bot_response = procesar_con_gemini_for_sender(sender, user_text)
+                    print(f"<<< OUTGOING TO {sender}: {bot_response}")
                     send_result = enviar_mensaje_whatsapp(sender, bot_response)
                     print("Envío WhatsApp resultado:", send_result)
 
