@@ -47,6 +47,7 @@ SYSTEM_PROMPT_RESERVAS = (
     "Cuando no se encuentres un caso en la documentacion, indica claramente que aun no se cuenta con la resolucion de ese caso, no menciones que no encuentras ese tipo de caso."
     "Siempre mantén un tono de servicio al cliente."
     "Despues de enviar la resolucion pidele al usuario que te confirme si pudo solucionar el problema con las indicaciones, en caso contrario indica que se escalara a soporte L2."
+    "Si te indica el usuario que no pudo solucionar con las indicaciones indica que estas coordinando para que un tecnico de Soporte L2 lo contacte a la brevedad."
 )
 
 # -------------------------
